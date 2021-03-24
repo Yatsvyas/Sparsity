@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Описание работы программы &#8212; документация Python Sparsity</title>
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+    <script src="static/jquery.js"></script>
+    <script src="static/underscore.js"></script>
+    <script src="static/doctools.js"></script>
+    <script src="static/translations.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" />
+    <link rel="next" title="Теоретическая часть" href="theory.html" />
+    <link rel="prev" title="Разрезженные матрицы" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Навигация</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Алфавитный указатель"
+             accesskey="I">указатель</a></li>
+        <li class="right" >
+          <a href="theory.html" title="Теоретическая часть"
+             accesskey="N">вперёд</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Разрезженные матрицы"
+             accesskey="P">назад</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">документация Python Sparsity</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Описание работы программы</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>Описание работы программы<a class="headerlink" href="#id1" title="Ссылка на этот заголовок">¶</a></h1>
+<p>В этой программе мы будем определять степени свободы для ячеек. Использовать будем самый низкий порядок <span class="math notranslate nohighlight">\(Q_1\)</span>, когда степени свободы связаны с вершинами ячеек.</p>
+<p>Мы представляем решение в виде линейной комбинации <span class="math notranslate nohighlight">\(u_h(\mathbf x) = \sum_{j=0}^{N-1} U_j \varphi_j(\mathbf x)\)</span>. Здесь <span class="math notranslate nohighlight">\(U_j\)</span> - вектор коэффициентов разложений. Так как мы не знаем этих значений (мы получим их как решение линейной или нелинейной системы), они называются «неизвестными» или «степенями свободы». Это можно назвать первым значением термина «степени свободы».</p>
+<p>Второе значение значение можно объяснить следующим образом. Мы ищем конечномерную функцию <span class="math notranslate nohighlight">\(u_h \in V_h\)</span>, она удовлетворяет некоторому набору уравнений (например, <span class="math notranslate nohighlight">\(a(u_h,\varphi_h)=(f,\varphi_h)\)</span> для всех тестовых функций <span class="math notranslate nohighlight">\(\varphi_h\in V_h\)</span>). Другими словами, решение должно лежать в некотором пространстве <span class="math notranslate nohighlight">\(V_h\)</span>. Однако, чтобы решить задачу на компьютере, мы должны выбрать базис для пространства. Это набор функций вида <span class="math notranslate nohighlight">\(\varphi_j(\mathbf x)\)</span>, которые мы использовали в разложении <span class="math notranslate nohighlight">\(u_h(\mathbf x)\)</span> с коэффициентами <span class="math notranslate nohighlight">\(U_j\)</span>.​ Описание «степеней свободы» в этом контексте требует от нас простого перечисления базисных функций в пространстве <span class="math notranslate nohighlight">\(V_h\)</span>. ​ Для <span class="math notranslate nohighlight">\(Q_1\)</span> элементов это означает простое перечисление вершин сетки каким-либо образом. Другими словами, перечисление степеней свободы это совершенно отдельная вещь от индексов, которые мы используем для вершин. Класс, которые обеспечивает перечисление базисных функций <span class="math notranslate nohighlight">\(V_h\)</span> ​называется <strong>DoFHandler</strong>.</p>
+<p><strong>Разреженность матриц</strong></p>
+<p>Рассмотрим один практический момент программы конечных элементов, а именно, что матрицы конечных элементов всегда очень разрежены: почти все элементы в этой матрице равны нулю.</p>
+<p>Если более точнее, то мы говорим, что матрица разрежена, если число ненулевых записей в строке матрицы не зависит от общего числа степеней свободы.</p>
+<p>Разреженность является одной из отличительных особенностей метода конечных элементов, по сравнению, скажем, с аппроксимацией решения дифференциального уравнения в частных производных с использованием разложения Тейлора и поиска коэффициентов или с использованием базиса Фурье.</p>
+<p>С практической точки зрения именно разреженность матриц позволяет нам решать задачи с миллионами или миллиардами неизвестных.</p>
+<p><strong>Как происходит нумерация степеней свободы</strong></p>
+<p>По умолчанию класс DoFHandler перечисляет степени свободы довольно случайным образом; следовательно, шаблон разреженности также не оптимизирован для какой-либо конкретной цели. Чтобы показать это, приведенный ниже код продемонстрирует простой способ вывода «шаблона разреженности», который соответствует DoFHandler, то есть объекту, представляющему все потенциально ненулевые элементы матрицы, которые можно построить при дискретизации дифференциального уравнения в частных производных на сетке и ее DoFHandler. Это отсутствие структуры в модели разреженности будет очевидно из рисунков, которые мы получим в результате работы программы.</p>
+<p>Для большинства приложений и алгоритмов точный способ нумерации степеней свободы не имеет значения. Однако, для некоторых алгоритмов это всё все важно. Поэтому deal.ii имеет алгоритмы, которые могут повторно перечислить степени свободы определенным образом в пространстве имен DoFRenumbering. Перенумерацию можно рассматривать как выбор другого, переставляемого базиса пространства конечных элементов. Шаблон разреженности и матрицы, которые возникают в результате этой перенумерации, также являются просто перестановкой строк и столбцов по сравнению с теми, которые мы получили бы без явной перенумерации. В приведенной ниже программе используется для этого алгоритм Катхилла — Макки. Рисунок после перенумерования мы также получим в результате работы программы</p>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Предыдущий раздел</h4>
+  <p class="topless"><a href="index.html"
+                        title="предыдущая глава">Разрезженные матрицы</a></p>
+  <h4>Следующий раздел</h4>
+  <p class="topless"><a href="theory.html"
+                        title="следующая глава">Теоретическая часть</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Эта страница</h3>
+    <ul class="this-page-menu">
+      <li><a href="sources/start_theory.rst.txt"
+            rel="nofollow">Исходный текст</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Быстрый поиск</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Искать" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Навигация</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Алфавитный указатель"
+             >указатель</a></li>
+        <li class="right" >
+          <a href="theory.html" title="Теоретическая часть"
+             >вперёд</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Разрезженные матрицы"
+             >назад</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">документация Python Sparsity</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Описание работы программы</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Machnov.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+  </body>
+</html>

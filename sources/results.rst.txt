@@ -1,0 +1,14 @@
+Результаты
+==========================
+
+Рисунок для случайного нумерования:
+
+.. image:: static/sparsity_pattern1.svg
+	:height: 300px
+	:width: 300px
+
+Рисунок с перенумерованными степенями свободы:
+
+.. image:: static/sparsity_pattern2.svg
+	:height: 300px
+	:width: 300px

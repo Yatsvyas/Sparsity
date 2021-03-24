@@ -1,0 +1,8 @@
+Листинг программы
+=================================
+
+.. literalinclude::  static/listing.cpp
+	:language: c++
+	:encoding: latin-1
+	:linenos:
+
